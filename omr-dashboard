@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OMR Dashboard - File Upload</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --background: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 2.2rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr 3fr;
+            }
+        }
+        
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h4 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-list {
+            margin-top: 1.5rem;
+        }
+        
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.8rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .file-item:last-child {
+            border-bottom: none;
+        }
+        
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .file-icon {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .file-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .file-action-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1rem;
+            transition: color 0.3s;
+        }
+        
+        .file-action-btn:hover {
+            color: var(--primary);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            
+            .header-content {
+                padding: 0 1rem;
+            }
+            
+            .card {
+                padding: 1.2rem;
+            }
+            
+            .upload-area {
+                padding: 1.5rem;
+            }
+        }
+        
+        .upload-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon"><i class="fas fa-poll"></i></span>
+                <span>OMR Evaluation System</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-upload"></i> Upload</a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> Results</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <aside class="sidebar">
+                <h3><i class="fas fa-chart-line"></i> Overall Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Sheets Processed</h4>
+                        <div class="value">248</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Average Score</h4>
+                        <div class="value">76%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Highest Score</h4>
+                        <div class="value">98%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Processing Accuracy</h4>
+                        <div class="value">99.2%</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 2rem;"><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;">
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> New Evaluation</button>
+                    <button class="btn"><i class="fas fa-history"></i> Recent Files</button>
+                    <button class="btn"><i class="fas fa-download"></i> Export All</button>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-upload"></i> Upload OMR Sheet</h2>
+                    </div>
+                    
+                    <div class="upload-area" id="dropZone">
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <h3>Upload OMR Sheet Image</h3>
+                        <p>Drag & drop your image here or click to browse</p>
+                        <p class="text-muted">Supported formats: JPG, PNG, JPEG | Max size: 10MB</p>
+                        <button class="btn btn-primary" id="browseBtn" style="margin-top: 1rem;">
+                            <i class="fas fa-folder-open"></i> Open File Manager
+                        </button>
+                        <input type="file" id="fileInput" class="file-input" accept="image/*" multiple>
+                    </div>
+                    
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressStatus">Waiting for upload...</span>
+                            <span id="progressPercentage">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div class="file-list" id="fileList">
+                        <!-- File items will be added here dynamically -->
+                    </div>
+                    
+                    <div class="upload-options">
+                        <button class="btn btn-success" id="processBtn" disabled>
+                            <i class="fas fa-cogs"></i> Process OMR Sheets
+                        </button>
+                        <button class="btn btn-primary" id="addMoreBtn">
+                            <i class="fas fa-plus"></i> Add More Files
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-history"></i> Recent Uploads</h2>
+                    </div>
+                    
+                    <div class="file-list">
+                        <div class="file-item">
+                            <div class="file-info">
+                                <i class="fas fa-file-image file-icon"></i>
+                                <div>
+                                    <div>omr_sheet_1.jpg</div>
+                                    <small class="text-muted">Uploaded: Today, 10:30 AM</small>
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <button class="file-action-btn"><i class="fas fa-eye"></i></button>
+                                <button class="file-action-btn"><i class="fas fa-download"></i></button>
+                                <button class="file-action-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="file-item">
+                            <div class="file-info">
+                                <i class="fas fa-file-image file-icon"></i>
+                                <div>
+                                    <div>exam_results.png</div>
+                                    <small class="text-muted">Uploaded: Yesterday, 3:45 PM</small>
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <button class="file-action-btn"><i class="fas fa-eye"></i></button>
+                                <button class="file-action-btn"><i class="fas fa-download"></i></button>
+                                <button class="file-action-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                        
+                        <div class="file-item">
+                            <div class="file-info">
+                                <i class="fas fa-file-image file-icon"></i>
+                                <div>
+                                    <div>test_answers.jpg</div>
+                                    <small class="text-muted">Uploaded: June 12, 2023</small>
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <button class="file-action-btn"><i class="fas fa-eye"></i></button>
+                                <button class="file-action-btn"><i class="fas fa-download"></i></button>
+                                <button class="file-action-btn"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <p>Automated OMR Evaluation System © 2023 | Powered by AI Technology</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const progressStatus = document.getElementById('progressStatus');
+        const processBtn = document.getElementById('processBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const fileList = document.getElementById('fileList');
+        const addMoreBtn = document.getElementById('addMoreBtn');
+        
+        // Open file manager when browse button is clicked
+        browseBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // Open file manager when upload area is clicked
+        dropZone.addEventListener('click', (e) => {
+            // Only trigger if the click wasn't on the browse button itself
+            if (e.target !== browseBtn && !browseBtn.contains(e.target)) {
+                fileInput.click();
+            }
+        });
+        
+        // Handle file selection
+        fileInput.addEventListener('change', handleFileSelection);
+        
+        // Handle drag and drop functionality
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--primary)';
+            dropZone.style.background = 'rgba(67, 97, 238, 0.05)';
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.background = 'transparent';
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.background = 'transparent';
+            
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                handleFileSelection();
+            }
+        });
+        
+        // Process button action
+        processBtn.addEventListener('click', processOMR);
+        
+        // Add more files button
+        addMoreBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        // Handle file selection
+        function handleFileSelection() {
+            if (fileInput.files.length > 0) {
+                // Clear previous files from the list
+                fileList.innerHTML = '';
+                
+                // Add each file to the list
+                Array.from(fileInput.files).forEach((file, index) => {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    fileItem.innerHTML = `
+                        <div class="file-info">
+                            <i class="fas fa-file-image file-icon"></i>
+                            <div>
+                                <div>${file.name}</div>
+                                <small class="text-muted">${formatFileSize(file.size)}</small>
+                            </div>
+                        </div>
+                        <div class="file-actions">
+                            <button class="file-action-btn" onclick="removeFile(${index})"><i class="fas fa-times"></i></button>
+                        </div>
+                    `;
+                    fileList.appendChild(fileItem);
+                });
+                
+                // Start upload simulation
+                simulateUpload();
+            }
+        }
+        
+        // Remove file from list
+        function removeFile(index) {
+            // Create a new FileList without the removed file
+            const dt = new DataTransfer();
+            Array.from(fileInput.files).forEach((file, i) => {
+                if (i !== index) {
+                    dt.items.add(file);
+                }
+            });
+            
+            fileInput.files = dt.files;
+            
+            // Refresh the file list
+            handleFileSelection();
+        }
+        
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Simulate upload progress
+        function simulateUpload() {
+            progressStatus.textContent = 'Uploading...';
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = `${progress}%`;
+                progressPercentage.textContent = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressStatus.textContent = 'Upload Complete!';
+                    processBtn.disabled = false;
+                }
+            }, 100);
+        }
+        
+        // Process the OMR sheet
+        function processOMR() {
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            setTimeout(() => {
+                processBtn.innerHTML = '<i class="fas fa-check"></i> Processing Complete';
+                alert('OMR sheets processed successfully! Results are now available.');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
