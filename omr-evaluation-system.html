@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced OMR Evaluation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --background: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 0 0 12px 12px;
+            margin-bottom: 2rem;
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 2.2rem;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+        }
+        
+        nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        
+        nav a:hover, nav a.active {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        @media (min-width: 992px) {
+            .main-content {
+                grid-template-columns: 1fr 3fr;
+            }
+        }
+        
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            height: fit-content;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 1.2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card h4 {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .content-area {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.8rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2.5rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .results-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (min-width: 768px) {
+            .results-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .score-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .score-card h3 {
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .subject-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        
+        .subject-table th, .subject-table td {
+            padding: 0.8rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .subject-table th {
+            background: var(--light);
+            font-weight: 600;
+        }
+        
+        .subject-table tr:hover {
+            background: var(--light);
+        }
+        
+        .visualization {
+            position: relative;
+            margin-top: 1.5rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .bubble {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid rgba(247, 37, 133, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: white;
+            background: rgba(247, 37, 133, 0.3);
+            transform: translate(-50%, -50%);
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 8px;
+            background: var(--success);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateX(100%);
+            transition: transform 0.3s;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        @media (max-width: 768px) {
+            nav ul {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .header-content {
+                padding: 0 1rem;
+            }
+            
+            .card {
+                padding: 1.2rem;
+            }
+            
+            .upload-area {
+                padding: 1.5rem;
+            }
+            
+            .export-options {
+                flex-direction: column;
+            }
+        }
+        
+        .ai-analysis {
+            background: linear-gradient(135deg, #4cc9f0, #4361ee);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-top: 1.5rem;
+        }
+        
+        .ai-analysis h4 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <span class="logo-icon"><i class="fas fa-poll"></i></span>
+                <span>OMR Evaluation System</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a href="#"><i class="fas fa-upload"></i> Upload</a></li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i> Results</a></li>
+                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                </ul>
+                <button class="mobile-menu-btn">☰</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <aside class="sidebar">
+                <h3><i class="fas fa-chart-line"></i> Overall Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h4>Sheets Processed</h4>
+                        <div class="value">248</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Average Score</h4>
+                        <div class="value">76%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Highest Score</h4>
+                        <div class="value">98%</div>
+                    </div>
+                    <div class="stat-card">
+                        <h4>Processing Accuracy</h4>
+                        <div class="value">99.2%</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin-top: 2rem;"><i class="fas fa-bolt"></i> Quick Actions</h3>
+                <div style="display: flex; flex-direction: column; gap: 0.8rem; margin-top: 1rem;">
+                    <button class="btn btn-primary"><i class="fas fa-plus"></i> New Evaluation</button>
+                    <button class="btn"><i class="fas fa-history"></i> Recent Files</button>
+                    <button class="btn"><i class="fas fa-download"></i> Export All</button>
+                </div>
+            </aside>
+
+            <main class="content-area">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-upload"></i> Upload OMR Sheet</h2>
+                    </div>
+                    <div class="upload-area" id="dropZone">
+                        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                        <h3>Upload OMR Sheet Image</h3>
+                        <p>Drag & drop your image here or click to browse</p>
+                        <p class="text-muted">Supported formats: JPG, PNG, JPEG | Max size: 10MB</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem;">
+                            <i class="fas fa-file"></i> Select File
+                        </button>
+                        <input type="file" id="fileInput" style="display: none;" accept="image/*">
+                    </div>
+                    
+                    <div class="progress-container" id="progressContainer">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text">
+                            <span id="progressStatus">Waiting for upload...</span>
+                            <span id="progressPercentage">0%</span>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align: center; margin-top: 1.5rem;">
+                        <button class="btn btn-success" id="processBtn" disabled>
+                            <i class="fas fa-cogs"></i> Process OMR Sheet
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-poll-h"></i> Evaluation Results</h2>
+                    </div>
+                    
+                    <div class="tabs">
+                        <div class="tab active" data-tab="summary">Summary</div>
+                        <div class="tab" data-tab="detailed">Detailed View</div>
+                        <div class="tab" data-tab="export">Export</div>
+                    </div>
+                    
+                    <div class="tab-content" id="summary">
+                        <div class="results-container">
+                            <div class="score-card">
+                                <h3>Total Score</h3>
+                                <div class="score-value">82/100</div>
+                                <div style="margin-top: 1rem;">Rank: 12/150</div>
+                            </div>
+                            
+                            <div>
+                                <h4>Subject-wise Scores</h4>
+                                <table class="subject-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Subject</th>
+                                            <th>Score</th>
+                                            <th>Percentage</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>Python</td>
+                                            <td>20/23</td>
+                                            <td>90%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Data Analysis</td>
+                                            <td>21/23</td>
+                                            <td>94%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>MySQL</td>
+                                            <td>19/23</td>
+                                            <td>84%</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Power BI</td>
+                                            <td>20/23</td>
+                                            <td>94%</td>
+                                            </tr>
+                                        <tr>
+                                            <td>Adv Stats</td>
+                                            <td>21/23</td>
+                                            <td>94%</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="ai-analysis">
+                            <h4><i class="fas fa-robot"></i> AI Analysis</h4>
+                            <p>Based on our analysis, this student shows strong performance in Mathematics but could benefit from additional practice in Science. The overall consistency is good with an upward trend in recent evaluations.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="detailed" style="display: none;">
+                        <h4>Detected Bubbles Visualization</h4>
+                        <div class="visualization">
+                            <img src="https://placehold.co/600x400/e0e0e0/999999?text=OMR+Sheet+Image" alt="OMR Sheet" style="width: 100%;">
+                            <div class="bubble" style="left: 30%; top: 25%;">1</div>
+                            <div class="bubble" style="left: 45%; top: 25%;">2</div>
+                            <div class="bubble" style="left: 60%; top: 25%;">3</div>
+                            <div class="bubble" style="left: 30%; top: 40%;">4</div>
+                            <div class="bubble" style="left: 45%; top: 40%;">5</div>
+                            <div class="bubble" style="left: 60%; top: 40%;">6</div>
+                            <div class="bubble" style="left: 30%; top: 55%;">7</div>
+                            <div class="bubble" style="left: 45%; top: 55%;">8</div>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4>Answer Analysis</h4>
+                            <table class="subject-table">
+                                <thead>
+                                    <tr>
+                                        <th>Question</th>
+                                        <th>Selected</th>
+                                        <th>Correct</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>1</td>
+                                        <td>B</td>
+                                        <td>B</td>
+                                        <td><span style="color: green;">Correct</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>2</td>
+                                        <td>C</td>
+                                        <td>A</td>
+                                        <td><span style="color: red;">Incorrect</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>3</td>
+                                        <td>D</td>
+                                        <td>D</td>
+                                        <td><span style="color: green;">Correct</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>4</td>
+                                        <td>A</td>
+                                        <td>A</td>
+                                        <td><span style="color: green;">Correct</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-content" id="export" style="display: none;">
+                        <h4>Export Results</h4>
+                        <p>Select the format you want to export the results in:</p>
+                        
+                        <div class="export-options">
+                            <button class="btn btn-primary" id="exportCsv">
+                                <i class="fas fa-file-csv"></i> Export as CSV
+                            </button>
+                            <button class="btn btn-primary" id="exportExcel">
+                                <i class="fas fa-file-excel"></i> Export as Excel
+                            </button>
+                            <button class="btn" id="exportPdf">
+                                <i class="fas fa-file-pdf"></i> Export as PDF
+                            </button>
+                            <button class="btn" id="printResults">
+                                <i class="fas fa-print"></i> Print Results
+                            </button>
+                        </div>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <h4>Export History</h4>
+                            <table class="subject-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Format</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>Jun 12, 2023</td>
+                                        <td>CSV</td>
+                                        <td>Completed</td>
+                                        <td><a href="#">Download</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Jun 10, 2023</td>
+                                        <td>Excel</td>
+                                        <td>Completed</td>
+                                        <td><a href="#">Download</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title"><i class="fas fa-chart-bar"></i> Performance Analytics</h2>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <footer>
+        <p>Automated OMR Evaluation System © 2023 | Powered by DeepSeek AI Technology</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const progressFill = document.getElementById('progressFill');
+        const progressPercentage = document.getElementById('progressPercentage');
+        const progressStatus = document.getElementById('progressStatus');
+        const processBtn = document.getElementById('processBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const notification = document.getElementById('notification');
+        const notificationText = document.getElementById('notification-text');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Simulate upload progress
+        function simulateUpload() {
+            progressStatus.textContent = 'Uploading...';
+            progressContainer.style.display = 'block';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = `${progress}%`;
+                progressPercentage.textContent = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressStatus.textContent = 'Upload Complete!';
+                    processBtn.disabled = false;
+                    showNotification('File uploaded successfully!');
+                }
+            }, 100);
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Process the OMR sheet
+        function processOMR() {
+            processBtn.disabled = true;
+            processBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            
+            setTimeout(() => {
+                showNotification('OMR sheet processed successfully!');
+                processBtn.innerHTML = '<i class="fas fa-check"></i> Processing Complete';
+                
+                // Show the results section
+                document.querySelector('.card:nth-child(2)').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+            }, 2000);
+        }
+        
+        // Switch tabs
+        function switchTab(tabName) {
+            // Hide all tab contents
+            tabContents.forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            // Show selected tab content
+            document.getElementById(tabName).style.display = 'block';
+            
+            // Update active tab
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                }
+            });
+        }
+        
+        // Export functions
+        function exportData(format) {
+            showNotification(`Exporting data as ${format}...`);
+            
+            setTimeout(() => {
+                showNotification(`Data exported successfully as ${format}`);
+            }, 1500);
+        }
+        
+        // Event listeners
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                simulateUpload();
+            }
+        });
+        
+        processBtn.addEventListener('click', processOMR);
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.dataset.tab);
+            });
+        });
+        
+        document.getElementById('exportCsv').addEventListener('click', () => exportData('CSV'));
+        document.getElementById('exportExcel').addEventListener('click', () => exportData('Excel'));
+        document.getElementById('exportPdf').addEventListener('click', () => exportData('PDF'));
+        document.getElementById('printResults').addEventListener('click', () => {
+            window.print();
+        });
+        
+        // Initialize chart
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('performanceChart').getContext('2d');
+            const chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Python', 'Data Analysis', 'MySQL', 'Power BI', 'Adv stats'],
+                    datasets: [{
+                        label: 'Score',
+                        data: [45, 37, 42, 38],
+                        backgroundColor: [
+                            'rgba(67, 97, 238, 0.7)',
+                            'rgba(76, 201, 240, 0.7)',
+                            'rgba(247, 37, 133, 0.7)',
+                            'rgba(248, 150, 30, 0.7)'
+                        ],
+                        borderColor: [
+                            'rgba(67, 97, 238, 1)',
+                            'rgba(76, 201, 240, 1)',
+                            'rgba(247, 37, 133, 1)',
+                            'rgba(248, 150, 30, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 50,
+                            title: {
+                                display: true,
+                                text: 'Score'
+                            }
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Enable drag and drop functionality
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--primary)';
+            dropZone.style.background = 'rgba(67, 97, 238, 0.05)';
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.background = 'transparent';
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--border)';
+            dropZone.style.background = 'transparent';
+            
+            if (e.dataTransfer.files.length > 0) {
+                simulateUpload();
+            }
+        });
+    </script>
+</body>
+</html>
