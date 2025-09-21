@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 3
+names: ['Bubble', 'SET B', 'objects']
+
+roboflow:
+  workspace: automated-omr-evaluation-scoring-system
+  project: my-first-project-bmjws
+  version: 3
+  license: Private
+  url: https://app.roboflow.com/automated-omr-evaluation-scoring-system/my-first-project-bmjws/3
