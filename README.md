@@ -9,20 +9,23 @@ Automated Optical Mark Recognition (OMR) for Efficient Exam Evaluation
 
 The AutoOMR Scoring System is designed to automate the evaluation of OMR sheets using Python, HTML, and Jupyter Notebooks. It processes scanned or photographed OMR sheets, detects marked answers, compares them with an answer key, and generates detailed results with visual feedback, eliminating manual evaluation errors and saving time.
 
-Features
+*Features*
 
-Automated Evaluation: Detects responses and calculates marks automatically.
+*Automated Evaluation: Detects responses and calculates marks automatically.
 
-Visual Feedback: Highlights correct answers in green, wrong answers in red, and unmarked correct options in yellow.
+*Visual Feedback: Highlights correct answers in green, wrong answers in red, and unmarked correct options in yellow.
 
-Detailed Reporting: Displays total marks, percentage, and grade on the input sheet.
+*Detailed Reporting: Displays total marks, percentage, and grade on the input sheet.
 
-Web Interface: Simple frontend to upload sheets and view results.
+*Web Interface: Simple frontend to upload sheets and view results.
 
-Data Storage: Results can be saved in a local database (results.db).
+*Data Storage: Results can be saved in a local database (results.db).
 
 
-Technologies Used
+----
+
+
+*Technologies Used*
 
 Python – Core backend logic for image processing and evaluation
 
@@ -36,7 +39,7 @@ HTML/CSS/Frontend – For creating the web interface
 
 SQLite – To store evaluation results
 
-How It Works
+*How It Works*
 
 1. Image Preprocessing – Converts input OMR images to grayscale and applies Gaussian blur to reduce noise.
 
@@ -57,7 +60,7 @@ How It Works
 
 ---
 
-Installation
+*Installation*
 
 1. Clone the repository:
 
@@ -73,11 +76,14 @@ Sample Output
 (Include screenshots of evaluated OMR sheets showing color-coded answers, total marks, percentage, and grade)
 
 
-Future Enhancements
+*Future Enhancements*
 
 Support Multiple Sheet Formats – Handle different layouts and structures.
+
 Batch Processing – Evaluate multiple sheets at once.
+
 AI-based Detection – Improve accuracy for faint or ambiguous markings.
+
 Export Results – Export evaluation reports as CSV, PDF, or Excel.
 
 
