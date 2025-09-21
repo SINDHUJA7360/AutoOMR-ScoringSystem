@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple OMR Evaluation System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --background: #f5f7fb;
+            --card-bg: #ffffff;
+            --text-primary: #333333;
+            --text-secondary: #6c757d;
+            --border: #dee2e6;
+        }
+        
+        body {
+            background-color: var(--background);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(120deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .logo-icon {
+            font-size: 2.2rem;
+        }
+        
+        .content {
+            padding: 2rem;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--primary);
+        }
+        
+        .card-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .upload-area:hover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            border: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .progress-container {
+            margin: 1.5rem 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: var(--light);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .results {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .score-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        
+        .score-card h3 {
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .score-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+        
+        .subject-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .subject-table th, .subject-table td {
+            padding: 0.8rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .subject-table th {
+            background: var(--light);
+            font-weight: 600;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding: 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-top: 1px solid var(--border);
+        }
+        
+        .instructions {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .instructions h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .instructions-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        
+        .instruction {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .instruction h4 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .results {
+                grid-template-columns: 1fr;
+            }
+            
+            .instructions-list {
+                grid-template-columns: 1fr;
+            }
+            
+            .export-options {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <span class="logo-icon"><i class="fas fa-poll"></i></span>
+                <span>Simple OMR Evaluation</span>
+            </div>
+        </header>
+
+        <div class="content">
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-upload"></i>
+                    <h2 class="card-title">Upload OMR Sheet</h2>
+                </div>
+                
+                <div class="upload-area">
+                    <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+                    <h3>Upload OMR Sheet Image</h3>
+                    <p>Drag & drop your image here or click to browse</p>
+                    <p class="text-muted">Supported formats: JPG, PNG, JPEG | Max size: 10MB</p>
+                    <button class="btn btn-primary" style="margin-top: 1rem;">
+                        <i class="fas fa-file"></i> Select File
+                    </button>
+                </div>
+                
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressStatus">Waiting for upload...</span>
+                        <span id="progressPercentage">0%</span>
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button class="btn btn-primary" id="processBtn" disabled>
+                        <i class="fas fa-cogs"></i> Process OMR Sheet
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-poll-h"></i>
+                    <h2 class="card-title">Evaluation Results</h2>
+                </div>
+                
+                <div class="results">
+                    <div class="score-card">
+                        <h3>Total Score</h3>
+                        <div class="score-value">82/100</div>
+                        <div style="margin-top: 1rem;">Rank: 12/150</div>
+                    </div>
+                    
+                    <div>
+                        <h4>Subject-wise Scores</h4>
+                        <table class="subject-table">
+                            <thead>
+                                <tr>
+                                    <th>Subject</th>
+                                    <th>Score</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Mathematics</td>
+                                    <td>45/50</td>
+                                    <td>90%</td>
+                                </tr>
+                                <tr>
+                                    <td>Science</td>
+                                    <td>37/50</td>
+                                    <td>74%</td>
+                                </tr>
+                                <tr>
+                                    <td>English</td>
+                                    <td>42/50</td>
+                                    <td>84%</td>
+                                </tr>
+                                <tr>
+                                    <td>Social Studies</td>
+                                    <td>38/50</td>
+                                    <td>76%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="export-options">
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-file-csv"></i> Export as CSV
+                    </button>
+                    <button class="btn btn-primary btn-sm">
+                        <i class="fas fa-file-excel"></i> Export as Excel
+                    </button>
+                    <button class="btn btn-sm">
+                        <i class="fas fa-file-pdf"></i> Export as PDF
+                    </button>
+                    <button class="btn btn-sm">
+                        <i class="fas fa-print"></i> Print Results
+                    </button>
+                </div>
+            </div>
+
+            <div class="instructions">
+                <h3><i class="fas fa-info-circle"></i> How to Use This System</h3>
+                
+                <div class="instructions-list">
+                    <div class="instruction">
+                        <h4><i class="fas fa-upload"></i> Step 1: Upload</h4>
+                        <p>Click the upload area to select your OMR sheet image or drag and drop it.</p>
+                    </div>
+                    
+                    <div class="instruction">
+                        <h4><i class="fas fa-cogs"></i> Step 2: Process</h4>
+                        <p>Click the "Process OMR Sheet" button after upload is complete.</p>
+                    </div>
+                    
+                    <div class="instruction">
+                        <h4><i class="fas fa-chart-bar"></i> Step 3: View Results</h4>
+                        <p>Check your scores and subject-wise performance in the results section.</p>
+                    </div>
+                    
+                    <div class="instruction">
+                        <h4><i class="fas fa-download"></i> Step 4: Export</h4>
+                        <p>Download your results in your preferred format using the export buttons.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Simple OMR Evaluation System © 2023 | Powered by AI Technology</p>
+        </footer>
+    </div>
+
+    <script>
+        // Simulate upload progress
+        document.querySelector('.upload-area').addEventListener('click', function() {
+            const progressFill = document.getElementById('progressFill');
+            const progressPercentage = document.getElementById('progressPercentage');
+            const progressStatus = document.getElementById('progressStatus');
+            const processBtn = document.getElementById('processBtn');
+            
+            progressStatus.textContent = 'Uploading...';
+            
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                progressFill.style.width = `${progress}%`;
+                progressPercentage.textContent = `${progress}%`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    progressStatus.textContent = 'Upload Complete!';
+                    processBtn.disabled = false;
+                }
+            }, 100);
+        });
+        
+        // Process button action
+        document.getElementById('processBtn').addEventListener('click', function() {
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            this.disabled = true;
+            
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-check"></i> Processing Complete';
+                alert('Processing complete! Results are now displayed.');
+            }, 2000);
+        });
+        
+        // Add drag and drop functionality
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--primary)';
+            uploadArea.style.background = 'rgba(67, 97, 238, 0.05)';
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.style.borderColor = 'var(--border)';
+            uploadArea.style.background = 'transparent';
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.borderColor = 'var(--border)';
+            uploadArea.style.background = 'transparent';
+            
+            // Simulate upload when files are dropped
+            if (e.dataTransfer.files.length > 0) {
+                const progressFill = document.getElementById('progressFill');
+                const progressPercentage = document.getElementById('progressPercentage');
+                const progressStatus = document.getElementById('progressStatus');
+                const processBtn = document.getElementById('processBtn');
+                
+                progressStatus.textContent = 'Uploading...';
+                
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressFill.style.width = `${progress}%`;
+                    progressPercentage.textContent = `${progress}%`;
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        progressStatus.textContent = 'Upload Complete!';
+                        processBtn.disabled = false;
+                    }
+                }, 100);
+            }
+        });
+    </script>
+</body>
+</html>
